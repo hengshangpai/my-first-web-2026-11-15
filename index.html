@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>个人主页</title>
+  <style>
+    :root {
+      --bg: #f6f8f9;
+      --card: #ffffff;
+      --line: #e4e9ec;
+      --text: #1b2026;
+      --muted: #6b7680;
+      --accent: #16a374;
+      --accent-soft: rgba(22, 163, 116, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; color: var(--text); line-height: 1.65;
+      font-family: -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      /* 背景壁纸：铺满、不重复、居中、固定；上面叠一层浅色遮罩保证文字可读 */
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(246, 248, 249, .45), rgba(246, 248, 249, .45)),
+        url("./assets/bg.jpg");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 64px 22px 80px; }
+
+    /* Hero */
+    .hero { margin-bottom: 46px; }
+    .eyebrow {
+      margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 42px); line-height: 1.2; letter-spacing: -.02em; }
+    .hero p { margin: 0; color: var(--muted); max-width: 560px; }
+
+    /* Alert */
+    .alert {
+      margin: 0 0 34px; padding: 13px 16px; border-radius: 10px; font-size: 13.5px;
+      color: #9a3412; background: #fff4ed; border: 1px solid #fbd9c4;
+    }
+
+    /* Section */
+    section { margin-bottom: 52px; }
+    .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+    .section-head h2 { margin: 0; font-size: 19px; letter-spacing: -.01em; }
+    .section-head span { font-size: 12px; color: var(--muted); }
+
+    .card {
+      /* 半透明 + 毛玻璃，保证卡片文字压在背景图上依然清晰 */
+      background: rgba(255, 255, 255, .74);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
+      backdrop-filter: blur(12px) saturate(1.2);
+      border: 1px solid rgba(255, 255, 255, .65); border-radius: 14px;
+      padding: 20px 22px; box-shadow: 0 1px 2px rgba(16, 24, 40, .06);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 16px; letter-spacing: -.01em; }
+    .desc { margin: 0; color: var(--muted); font-size: 14px; }
+
+    /* Projects */
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+    .project { display: flex; flex-direction: column; gap: 12px; transition: .18s ease; }
+    .project:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(16, 24, 40, .09); }
+    .link {
+      margin-top: auto; font-size: 13.5px; font-weight: 600;
+      color: var(--accent); text-decoration: none;
+    }
+    .link:hover { text-decoration: underline; }
+
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-size: 11.5px; padding: 2px 9px; border-radius: 999px;
+      background: var(--accent-soft); color: #0f7a58;
+    }
+
+    /* Timeline */
+    .timeline { list-style: none; margin: 0; padding: 0 0 0 26px; position: relative; }
+    .timeline::before {
+      content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--line);
+    }
+    .entry { position: relative; margin-bottom: 16px; }
+    .entry::before {
+      content: ""; position: absolute; left: -26px; top: 22px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--accent);
+    }
+    .entry-date {
+      display: inline-block; margin-bottom: 6px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .entry-card { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Skills */
+    .skills { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+    .skill { display: flex; flex-direction: column; gap: 7px; }
+    .skill-head { display: flex; justify-content: space-between; align-items: baseline; }
+    .skill-name { font-size: 14px; font-weight: 600; }
+    .skill-level { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .bar { height: 7px; border-radius: 999px; background: #edf1f3; overflow: hidden; }
+    .bar-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, #34d399, var(--accent));
+      transition: width .6s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .placeholder { margin: 0; padding: 18px 0; color: var(--muted); font-size: 14px; list-style: none; }
+
+    /* 卡片外的文字（标题、技能、页脚）压在背景图上时加一层浅色描边阴影，提升可读性 */
+    .hero, .section-head, .skills, .placeholder, footer {
+      text-shadow: 0 1px 3px rgba(255, 255, 255, .9);
+    }
+
+    footer {
+      margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      font-size: 12.5px; color: var(--muted);
+    }
+    footer a { color: inherit; }
+
+    @media (max-width: 520px) {
+      .wrap { padding: 42px 18px 60px; }
+      .card { padding: 17px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Portfolio</p>
+      <h1>个人主页</h1>
+      <p>项目、时间线与技能，数据实时来自 Supabase。</p>
+    </header>
+
+    <div id="alert" class="alert" hidden></div>
+
+    <section>
+      <div class="section-head">
+        <h2>项目</h2>
+        <span>Projects</span>
+      </div>
+      <div id="projects" class="grid">
+        <p class="placeholder">加载中…</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>时间线</h2>
+        <span>Timeline</span>
+      </div>
+      <ol id="timeline" class="timeline">
+        <li class="placeholder">加载中…</li>
+      </ol>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>技能</h2>
+        <span>Skills</span>
+      </div>
+      <ul id="skills" class="skills">
+        <li class="placeholder">加载中…</li>
+      </ul>
+    </section>
+
+    <footer>
+      <span>数据来源：Supabase</span>
+      <span>原生 HTML / CSS / JS 构建</span>
+    </footer>
+  </div>
+
+  <script src="./vendor/supabase.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
